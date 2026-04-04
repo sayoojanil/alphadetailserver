@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+server/.env
+
+# Local Development
+.DS_Store
+*.log
+.gemini/
+api_key.json
+tmp/
+dist/
+.env.local
+.env.*.local
