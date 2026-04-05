@@ -14,6 +14,9 @@ const productSchema = new mongoose.Schema({
   tags: { type: [String] },
   imgs: { type: [String] },
   grad: { type: String },
+  inStock: { type: Boolean, default: true },
+  howToUse: { type: [String] },
+  advantage: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

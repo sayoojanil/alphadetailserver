@@ -25,6 +25,7 @@ router.post('/', protect, adminOnly, upload.array('images', 3), async (req, res)
     }
     if (data.feats && typeof data.feats === 'string') data.feats = JSON.parse(data.feats);
     if (data.tags && typeof data.tags === 'string') data.tags = JSON.parse(data.tags);
+    if (data.howToUse && typeof data.howToUse === 'string') data.howToUse = JSON.parse(data.howToUse);
     
     let product = await Product.findOne({ id: data.id });
     if (product) {
