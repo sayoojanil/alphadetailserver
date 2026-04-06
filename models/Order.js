@@ -16,7 +16,7 @@ const orderSchema = new mongoose.Schema({
   gst: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
   total: { type: Number, required: true },
-  paymentMethod: { type: String, enum: ['cod', 'razorpay'], default: 'cod' },
+  paymentMethod: { type: String, enum: ['cod', 'razorpay', 'upi', 'nb', 'card'], default: 'cod' },
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
   razorpayOrderId: { type: String },
   razorpayPaymentId: { type: String },

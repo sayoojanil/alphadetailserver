@@ -49,4 +49,8 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Internal Server Error', details: err });
 });
 
-app.listen(PORT, () => console.log(`[SERVER] Running on http://localhost:${PORT}`));
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => console.log(`[SERVER] Running on http://localhost:${PORT}`));
+}
+
+module.exports = app;

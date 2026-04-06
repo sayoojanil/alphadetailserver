@@ -41,7 +41,7 @@ router.get('/my-orders', protect, async (req, res) => {
 router.get('/admin', protect, adminOnly, async (req, res) => {
   try {
     const orders = await Order.find()
-      .populate('user', 'firstName lastName email phone')
+      .populate('user', 'firstName lastName email phone avatar')
       .populate('items.product', 'imgs name')
       .sort('-createdAt');
     res.json(orders);

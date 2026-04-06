@@ -17,7 +17,16 @@ const storage = new CloudinaryStorage({
   }
 });
 
-const upload = multer({ storage: storage });
+const avatarStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'alphadetail_avatars',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+    transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }]
+  }
+});
 
-module.exports = { cloudinary, upload };
-// sasas
+const upload = multer({ storage: storage });
+const avatarUpload = multer({ storage: avatarStorage });
+
+module.exports = { cloudinary, upload, avatarUpload };

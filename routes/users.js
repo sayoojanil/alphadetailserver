@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const { protect, adminOnly } = require('../middleware/auth');
+const { avatarUpload } = require('../utils/cloudinary');
 
 // Get all users (Admin only)
 router.get('/', protect, adminOnly, async (req, res) => {
@@ -16,6 +17,49 @@ router.patch('/me/cart', protect, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(req.user._id, { cart: req.body.cart }, { new: true }).select('cart');
     res.json(user);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Update current user's profile
+router.post('/me', protect, avatarUpload.single('avatar'), async (req, res) => {
+  try {
+    console.log('👤 Profile Update Request:', req.body);
+    console.log('🖼️ Avatar File:', req.file ? req.file.path : 'None');
+    
+    // Allow partial updates if only avatar is sent
+    const { firstName, lastName, phone, address, address2, city, pin } = req.body;
+    let upData = {};
+
+    if (req.file) upData.avatar = req.file.path;
+    if (firstName) upData.firstName = firstName;
+    if (lastName !== undefined) upData.lastName = lastName;
+    if (phone) upData.phone = phone;
+    if (address) upData.address = address;
+    if (address2 !== undefined) upData.address2 = address2;
+    if (city) upData.city = city;
+    if (pin) upData.pin = pin;
+
+    // Basic validation only if full form sent
+    if (!req.file || firstName) {
+      if (!firstName && !req.file) return res.status(400).json({ error: 'First name is required' });
+      if (phone) {
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(phone.replace(/\D/g, ''))) return res.status(400).json({ error: 'Invalid phone number (10 digits expected)' });
+      }
+      if (pin) {
+        const pinCheck = /^\d{6}$/.test(pin.replace(/\D/g, ''));
+        if (!pinCheck) return res.status(400).json({ error: 'Invalid PIN Code (6 digits expected)' });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      upData,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    console.log('✅ Updated User:', updatedUser);
+    res.json(updatedUser);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
