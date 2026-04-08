@@ -5,6 +5,8 @@ const User = require('../models/User');
 
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
+const { loginLimiter } = require('../middleware/rateLimit');
+
 // Register
 router.post('/register', async (req, res) => {
   try {
@@ -17,7 +19,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
