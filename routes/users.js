@@ -27,16 +27,26 @@ router.post('/me', protect, avatarUpload.single('avatar'), async (req, res) => {
     console.log('🖼️ Avatar File:', req.file ? req.file.path : 'None');
     
     // Allow partial updates if only avatar is sent
-    const { firstName, lastName, phone, address, address2, city, pin } = req.body;
+    const { 
+      firstName, lastName, phone, phoneCode, secondaryPhone,
+      houseNo, address, landmark, city, district, state, country, pin 
+    } = req.body;
+    
     let upData = {};
 
     if (req.file) upData.avatar = req.file.path;
     if (firstName) upData.firstName = firstName;
     if (lastName !== undefined) upData.lastName = lastName;
     if (phone) upData.phone = phone;
+    if (phoneCode) upData.phoneCode = phoneCode;
+    if (secondaryPhone !== undefined) upData.secondaryPhone = secondaryPhone;
+    if (houseNo) upData.houseNo = houseNo;
     if (address) upData.address = address;
-    if (address2 !== undefined) upData.address2 = address2;
+    if (landmark !== undefined) upData.landmark = landmark;
     if (city) upData.city = city;
+    if (district) upData.district = district;
+    if (state) upData.state = state;
+    if (country) upData.country = country;
     if (pin) upData.pin = pin;
 
     // Basic validation only if full form sent

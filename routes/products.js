@@ -29,7 +29,7 @@ router.post('/', protect, adminOnly, upload.array('images', 3), async (req, res)
     
     let product = await Product.findOne({ id: data.id });
     if (product) {
-      product = await Product.findOneAndUpdate({ id: data.id }, data, { new: true });
+      product = await Product.findOneAndUpdate({ id: data.id }, data, { returnDocument: 'after' });
     } else {
       product = await Product.create(data);
     }
