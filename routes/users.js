@@ -12,6 +12,14 @@ router.get('/', protect, adminOnly, async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Get current user profile
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    res.json(user);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Update current user's cart
 router.patch('/me/cart', protect, async (req, res) => {
   try {

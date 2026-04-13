@@ -27,11 +27,16 @@ router.post('/', protect, adminOnly, upload.array('images', 3), async (req, res)
     if (data.tags && typeof data.tags === 'string') data.tags = JSON.parse(data.tags);
     if (data.howToUse && typeof data.howToUse === 'string') data.howToUse = JSON.parse(data.howToUse);
     
-    let product = await Product.findOne({ id: data.id });
-    if (product) {
-      product = await Product.findOneAndUpdate({ id: data.id }, data, { returnDocument: 'after' });
+    let product;
+    if (data._id) {
+      product = await Product.findByIdAndUpdate(data._id, data, { new: true, runValidators: true });
     } else {
-      product = await Product.create(data);
+      product = await Product.findOne({ id: data.id });
+      if (product) {
+        product = await Product.findOneAndUpdate({ id: data.id }, data, { new: true });
+      } else {
+        product = await Product.create(data);
+      }
     }
     res.json(product);
   } catch (err) { res.status(500).json({ error: err.message }); }

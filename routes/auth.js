@@ -14,7 +14,9 @@ router.post('/register', async (req, res) => {
     const userEx = await User.findOne({ email });
     if (userEx) return res.status(400).json({ error: 'User already exists' });
     const user = await User.create({ firstName, lastName, email, password, phone });
-    res.status(201).json({ id: user._id, token: generateToken(user._id), firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, phone: user.phone, address: user.address, city: user.city, pin: user.pin, avatar: user.avatar, cart: user.cart, createdAt: user.createdAt });
+    const userResp = user.toObject();
+    delete userResp.password;
+    res.status(201).json({ ...userResp, token: generateToken(user._id) });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -24,7 +26,9 @@ router.post('/login', loginLimiter, async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
-      res.json({ id: user._id, token: generateToken(user._id), firstName: user.firstName, lastName: user.lastName, email: user.email, role: user.role, phone: user.phone, address: user.address, city: user.city, pin: user.pin, avatar: user.avatar, cart: user.cart, createdAt: user.createdAt });
+      const userResp = user.toObject();
+      delete userResp.password;
+      res.json({ ...userResp, token: generateToken(user._id) });
     } else {
       res.status(401).json({ error: 'Invalid credentials' });
     }
