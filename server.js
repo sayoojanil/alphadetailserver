@@ -13,16 +13,28 @@ const userRoutes = require('./routes/users');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const connectDB = require('./utils/db');
+
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Database connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(async () => {
-    console.log('[DATABASE] Connected to MongoDB');
-    // Seed Admin User
+// Ensure DB is connected for every request (Serverless stability)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('[DB CONNECTION ERROR]', err);
+    res.status(500).json({ error: 'Database connection failed', details: err.message });
+  }
+});
+
+// One-time Admin seed on startup (for non-serverless or first cold start)
+const seedAdmin = async () => {
+  try {
+    await connectDB();
     const User = require('./models/User');
     const adminExists = await User.findOne({ email: process.env.ADMIN_EMAIL });
     if (!adminExists) {
@@ -33,8 +45,9 @@ mongoose.connect(process.env.MONGODB_URI)
       });
       console.log('[AUTH] Default Admin Created:', process.env.ADMIN_EMAIL);
     }
-  })
-  .catch(err => console.error('[DATABASE] Connection error:', err));
+  } catch (e) { console.error('[AUTH SEED ERROR]', e); }
+};
+seedAdmin();
 
 // Routes
 app.get('/', (req, res) => {
